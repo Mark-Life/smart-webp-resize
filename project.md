@@ -126,12 +126,12 @@ The "smart" resizing logic is key here. Here's a good approach for determining t
   - [x] Create domain models for request/response
   - [x] Document interfaces
 
-- [ ] **Image Input Handler**
+- [x] **Image Input Handler**
 
-  - [ ] Write tests for URL-based image retrieval
-  - [ ] Implement image retrieval from URL
-  - [ ] Write tests for file upload handling
-  - [ ] Implement file upload handling
+  - [x] Write tests for URL-based image retrieval
+  - [x] Implement image retrieval from URL
+  - [x] Write tests for file upload handling
+  - [x] Implement file upload handling
 
 - [ ] **Image Processing**
 

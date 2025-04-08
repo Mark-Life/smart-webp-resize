@@ -1,7 +1,17 @@
 package processor
 
 import (
+	"errors"
+
 	"github.com/Mark-Life/smart-webp-resize/pkg/models"
+)
+
+// Common errors
+var (
+	ErrProcessingFailed = errors.New("image processing failed")
+	ErrInvalidImage     = errors.New("invalid or unsupported image format")
+	ErrResizingFailed   = errors.New("image resizing failed")
+	ErrEncodingFailed   = errors.New("WebP encoding failed")
 )
 
 // ImageProcessor defines the interface for processing images

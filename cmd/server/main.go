@@ -1,21 +1,37 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/Mark-Life/smart-webp-resize/internal/api"
-	"github.com/Mark-Life/smart-webp-resize/pkg/config"
+	"github.com/Mark-Life/smart-webp-resize/internal/handler"
+	"github.com/Mark-Life/smart-webp-resize/internal/processor"
 )
 
 func main() {
-	cfg := config.New()
+	// Create dependencies
+	imageHandler := handler.NewImageHandler()
+	imageProcessor := processor.New()
 	
-	server := api.NewServer(cfg)
+	// Create API
+	imageAPI := api.NewImageAPI(imageHandler, imageProcessor)
 	
-	fmt.Printf("Starting Smart WebP Resizer server on :%s...\n", cfg.Port)
-	if err := http.ListenAndServe(":"+cfg.Port, server); err != nil {
+	// Set up HTTP routes
+	http.HandleFunc("/health", imageAPI.Health)
+	http.HandleFunc("/process", imageAPI.ProcessFromURL)
+	http.HandleFunc("/upload", imageAPI.ProcessFromUpload)
+	
+	// Get port from environment variable or use default
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	
+	// Start server
+	log.Printf("Server starting on port %s...\n", port)
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}
 } 
