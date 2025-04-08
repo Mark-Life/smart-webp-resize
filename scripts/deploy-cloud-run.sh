@@ -2,16 +2,17 @@
 set -e
 
 # Configuration variables
-PROJECT_ID="YOUR_GCP_PROJECT_ID"  # Replace with your GCP project ID
-REGION="us-central1"              # Replace with your preferred region
+PROJECT_ID="smart-webp-resize"  # Replace with your GCP project ID
+REGION="europe-west1"              # Frankfurt region
 SERVICE_NAME="webp-resizer"       # Name of the Cloud Run service
 IMAGE_NAME="webp-resizer"         # Name of the container image
-MAX_INSTANCES=10                  # Maximum number of instances to scale to
+MAX_INSTANCES=5                   # 5 instances to limit potential costs
 MEMORY="512Mi"                    # Memory allocation per instance
-CPU="1"                           # CPU allocation (1 = 1 vCPU)
+CPU=1                             # 1 vCPU
 CONCURRENCY=80                    # Maximum concurrent requests per instance
-TIMEOUT="300s"                    # Maximum request timeout
-REQUEST_LIMIT="60/minute"         # Rate limiting for cost management
+TIMEOUT="60s"                     # 1 minute
+REQUEST_LIMIT="30/minute"         # 30/minute for cost management
+BUDGET_AMOUNT="15"                # Monthly budget cap in USD
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -58,7 +59,7 @@ gcloud run deploy ${SERVICE_NAME} \
   --max-instances ${MAX_INSTANCES} \
   --concurrency ${CONCURRENCY} \
   --timeout ${TIMEOUT} \
-  --set-env-vars MAX_WIDTH=1920,MAX_HEIGHT=1080,DEFAULT_QUALITY=85 \
+  --set-env-vars MAX_WIDTH=1280,MAX_HEIGHT=720,DEFAULT_QUALITY=80 \
   --no-allow-unauthenticated
 
 # Configure rate limiting
@@ -89,6 +90,57 @@ gcloud run services add-iam-policy-binding ${SERVICE_NAME} \
 # Display service URL
 SERVICE_URL=$(gcloud run services describe ${SERVICE_NAME} --region=${REGION} --format='value(status.url)')
 
+# Set up a budget alert for the project
+echo -e "${YELLOW}Setting up budget alert ($${BUDGET_AMOUNT}/month)...${NC}"
+BUDGET_NAME="${SERVICE_NAME}-budget"
+
+# Create a budget configuration file
+cat > budget.json << EOF
+{
+  "displayName": "${BUDGET_NAME}",
+  "amount": {
+    "specifiedAmount": {
+      "currencyCode": "USD",
+      "units": "${BUDGET_AMOUNT}"
+    }
+  },
+  "thresholdRules": [
+    {
+      "thresholdPercent": 0.5
+    },
+    {
+      "thresholdPercent": 0.75
+    },
+    {
+      "thresholdPercent": 0.9
+    },
+    {
+      "thresholdPercent": 1.0
+    }
+  ],
+  "notificationsRule": {
+    "pubsubTopic": "projects/${PROJECT_ID}/topics/budget-notifications",
+    "schemaVersion": "1.0"
+  }
+}
+EOF
+
+# Create PubSub topic for budget notifications if it doesn't exist
+gcloud pubsub topics describe budget-notifications --project=${PROJECT_ID} &> /dev/null || \
+gcloud pubsub topics create budget-notifications --project=${PROJECT_ID}
+
+# Create the budget
+echo -e "${YELLOW}Creating budget alert...${NC}"
+gcloud billing budgets create \
+  --billing-account=$(gcloud billing accounts list --format="value(ACCOUNT_ID)" | head -1) \
+  --display-name="${BUDGET_NAME}" \
+  --budget-amount=${BUDGET_AMOUNT}USD \
+  --threshold-rule=percent=0.5 \
+  --threshold-rule=percent=0.75 \
+  --threshold-rule=percent=0.9 \
+  --threshold-rule=percent=1.0 \
+  --notifications-rule-pubsub-topic=projects/${PROJECT_ID}/topics/budget-notifications
+
 echo -e "${GREEN}Deployment complete!${NC}"
 echo -e "Service URL: ${SERVICE_URL}"
 echo -e "${YELLOW}Note: This service requires authentication to access.${NC}"
@@ -97,6 +149,9 @@ echo -e "To test the service, run: curl -H \"Authorization: Bearer \$(gcloud aut
 echo
 echo -e "${YELLOW}Cost Management:${NC}"
 echo -e "- Max instances: ${MAX_INSTANCES}"
+echo -e "- CPU allocation: ${CPU} vCPU"
 echo -e "- Memory per instance: ${MEMORY}"
 echo -e "- Request rate limit: ${REQUEST_LIMIT}"
-echo -e "- Authentication required: Yes" 
+echo -e "- Budget alert set at: \$${BUDGET_AMOUNT}/month"
+echo -e "- Authentication required: Yes"
+echo -e "${RED}Important: If you need to process more images, consider increasing the request limit temporarily.${NC}" 

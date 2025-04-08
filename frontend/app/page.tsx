@@ -133,6 +133,24 @@ export default function Home() {
           <ResultsGrid processedImages={processedImages} />
         )}
       </div>
+
+      <footer className="mt-16 pt-8 border-t text-center text-sm text-muted-foreground">
+        <div className="space-y-2">
+          <p className="text-xl">
+            <a
+              href="https://mark-life.com"
+              className="text-primary hover:underline"
+            >
+              Mark Life | Andrey Markin
+            </a>
+          </p>
+          <p>This Go and Next.js app done in two hours.</p>
+          <p>
+            Bring your business idea – 3 days to Proof of Concept, 2 weeks to
+            MVP
+          </p>
+        </div>
+      </footer>
     </main>
   );
 }
