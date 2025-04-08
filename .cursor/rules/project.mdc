@@ -1,0 +1,40 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+ # Smart WebP Image Resizer
+
+A serverless image processing service that automatically resizes images to web-optimal dimensions and converts them to WebP format for improved performance. Supports input via direct upload or URL.
+
+## Tech Stack
+- Go 1.24+
+- Serverless Architecture
+- WebP Image Format
+- REST API
+
+## Architecture
+- **Serverless Function**: Main function that handles image processing and conversion
+- **Image Processor**: Core logic for decoding, resizing, and encoding images
+- **API Layer**: REST endpoints for health checks and image processing requests
+
+## Features
+- Automatic image resizing with aspect ratio preservation
+- WebP conversion for optimal web performance
+- Support for multiple input image formats (JPEG, PNG, GIF)
+- Detailed metadata generation for processed images
+
+## Code Style
+```json
+{
+  "lineWidth": 100,
+  "tabWidth": 4,
+  "useTabs": false
+}
+```
+
+## Project Structure
+- `cmd`: Entry points for the application
+- `internal`: Private application code
+- `pkg`: Public reusable packages
+- `test`: Test files and resources
