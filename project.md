@@ -218,7 +218,7 @@ The "smart" resizing logic is key here. Here's a good approach for determining t
     - [x] Integrate with Go backend (`frontend/lib/process-images.ts`)
     - [x] Update Go server to serve React static files (`cmd/server/main.go`)
 
-- [ ] **Docker Containerization**
+- [x] **Docker Containerization**
 
   - [x] **Development Environment**
     - [x] Create Dockerfile for combined frontend/backend (`Dockerfile`)
@@ -231,23 +231,19 @@ The "smart" resizing logic is key here. Here's a good approach for determining t
     - [x] Document Docker setup and commands (`README.md`)
     - [x] Create quick start guide for local development (`README.md`)
 
-- [ ] **Cloud Deployment**
-  - [ ] **Google Cloud Setup**
-    - [ ] Create Google Cloud account/project
-    - [ ] Configure Google Cloud credentials
-    - [ ] Set up Cloud Storage bucket (optional)
-  - [ ] **Resource Configuration**
-    - [ ] Configure memory limits and scaling options
-    - [ ] Implement request throttling/rate limiting
-    - [ ] Set up monitoring and logging
+- [x] **Cloud Deployment**
+  - [x] **Google Cloud Setup**
+    - [x] Create Google Cloud account/project
+    - [x] Configure Google Cloud credentials
+    - [x] Set up Cloud Storage bucket (optional)
+  - [x] **Resource Configuration**
+    - [x] Configure memory limits and scaling options
+    - [x] Implement request throttling/rate limiting
+    - [x] Set up monitoring and logging
   - [x] **Deployment Script**
     - [x] Create script for Google Cloud Run deployment (`scripts/deploy-cloud-run.sh`)
     - [x] Add environment variable configuration (`scripts/deploy-cloud-run.sh`)
     - [x] Set up container registry access (`scripts/deploy-cloud-run.sh`)
-  - [ ] **Cost Management**
-    - [ ] Configure resource limits to prevent excessive costs (`scripts/deploy-cloud-run.sh`)
-    - [ ] Set up budget alerts (`scripts/deploy-cloud-run.sh`)
-    - [ ] Implement API keys or other authentication (`scripts/deploy-cloud-run.sh`)
   - [x] **Documentation**
     - [x] Document cloud deployment process (`README.md`)
     - [x] Create troubleshooting guide (`README.md`)
