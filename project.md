@@ -184,7 +184,70 @@ The "smart" resizing logic is key here. Here's a good approach for determining t
   - [x] Document deployment process (`README.md`)
 
 - [x] **Documentation**
+
   - [x] Write API documentation (`README.md`)
   - [x] Create usage examples (`README.md`, `test/testdata/test_image.html`)
   - [x] Document configuration options (`pkg/config/config.go`, `README.md`)
   - [x] Complete project README (`README.md`)
+
+- [ ] **React Frontend**
+
+  - [x] **Setup & Structure**
+    - [x] Create React application scaffold (`frontend/`)
+    - [x] Set up project dependencies (React, TypeScript, etc.) (`frontend/package.json`)
+    - [x] Design component hierarchy and page structure (`frontend/app/page.tsx`, `frontend/components/`)
+  - [x] **Core Components**
+    - [x] Create drag-and-drop file upload zone (`frontend/components/image-uploader.tsx`)
+    - [x] Implement URL input field (`frontend/components/image-uploader.tsx`)
+    - [x] Build settings panel (image dimensions, quality) (`frontend/components/settings-form.tsx`)
+    - [x] Design before/after image comparison component (`frontend/components/results-grid.tsx`)
+    - [x] Add download button for processed images (`frontend/components/results-grid.tsx`)
+  - [x] **State & API Integration**
+    - [x] Implement state management for user settings (`frontend/app/page.tsx`)
+    - [x] Connect to backend API endpoints (`frontend/lib/process-images.ts`)
+    - [x] Add upload progress indicators (`frontend/components/image-uploader.tsx`)
+    - [x] Handle multiple file uploads (queuing) (`frontend/app/page.tsx`)
+    - [x] Implement error handling (`frontend/lib/process-images.ts`)
+  - [x] **Styling & UX**
+    - [x] Create responsive layout (`frontend/app/page.tsx`, `frontend/components/ui/`)
+    - [x] Apply consistent styling (`frontend/app/globals.css`, `frontend/tailwind.config.ts`)
+    - [x] Add loading states and animations (`frontend/components/image-uploader.tsx`)
+    - [x] Implement accessibility features (`frontend/components/ui/`)
+  - [x] **Build & Integration**
+    - [x] Configure build process (`frontend/next.config.mjs`)
+    - [x] Integrate with Go backend (`frontend/lib/process-images.ts`)
+    - [x] Update Go server to serve React static files (`cmd/server/main.go`)
+
+- [ ] **Docker Containerization**
+
+  - [x] **Development Environment**
+    - [x] Create Dockerfile for combined frontend/backend (`Dockerfile`)
+    - [x] Write docker-compose.yml for local development (`docker-compose.yml`)
+  - [x] **Production Container**
+    - [x] Create multi-stage Dockerfile for combined frontend/backend (`Dockerfile`)
+    - [x] Optimize container size and build process (`Dockerfile`)
+    - [x] Configure environment variables (`docker-compose.yml`)
+  - [x] **Documentation**
+    - [x] Document Docker setup and commands (`README.md`)
+    - [x] Create quick start guide for local development (`README.md`)
+
+- [ ] **Cloud Deployment**
+  - [ ] **Google Cloud Setup**
+    - [ ] Create Google Cloud account/project
+    - [ ] Configure Google Cloud credentials
+    - [ ] Set up Cloud Storage bucket (optional)
+  - [ ] **Resource Configuration**
+    - [ ] Configure memory limits and scaling options
+    - [ ] Implement request throttling/rate limiting
+    - [ ] Set up monitoring and logging
+  - [x] **Deployment Script**
+    - [x] Create script for Google Cloud Run deployment (`scripts/deploy-cloud-run.sh`)
+    - [x] Add environment variable configuration (`scripts/deploy-cloud-run.sh`)
+    - [x] Set up container registry access (`scripts/deploy-cloud-run.sh`)
+  - [ ] **Cost Management**
+    - [ ] Configure resource limits to prevent excessive costs (`scripts/deploy-cloud-run.sh`)
+    - [ ] Set up budget alerts (`scripts/deploy-cloud-run.sh`)
+    - [ ] Implement API keys or other authentication (`scripts/deploy-cloud-run.sh`)
+  - [x] **Documentation**
+    - [x] Document cloud deployment process (`README.md`)
+    - [x] Create troubleshooting guide (`README.md`)

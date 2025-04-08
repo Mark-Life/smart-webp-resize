@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/Mark-Life/smart-webp-resize/internal/handler"
 	"github.com/Mark-Life/smart-webp-resize/internal/processor"
@@ -64,6 +65,27 @@ func (api *ImageAPI) ProcessFromURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Set filename for download if requested
+	if r.URL.Query().Get("download") == "true" || r.URL.Query().Get("format") == "webp" {
+		// Extract original filename from URL or use a generic name
+		filename := "image.webp"
+		if lastSlashIndex := strings.LastIndex(url, "/"); lastSlashIndex != -1 && lastSlashIndex < len(url)-1 {
+			origFilename := url[lastSlashIndex+1:]
+			// Remove query parameters if any
+			if queryIndex := strings.Index(origFilename, "?"); queryIndex != -1 {
+				origFilename = origFilename[:queryIndex]
+			}
+			// Remove the original extension and replace with .webp
+			if extIndex := strings.LastIndex(origFilename, "."); extIndex != -1 {
+				filename = origFilename[:extIndex] + ".webp"
+			} else {
+				filename = origFilename + ".webp"
+			}
+		}
+		
+		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+	}
+
 	// Return the processed image
 	w.Header().Set("Content-Type", "image/webp")
 	w.Header().Set("Content-Length", strconv.Itoa(len(processedData)))
@@ -102,6 +124,28 @@ func (api *ImageAPI) ProcessFromUpload(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, fmt.Sprintf("Failed to encode metadata: %v", err), http.StatusInternalServerError)
 		}
 		return
+	}
+
+	// Set filename for download if requested
+	if r.URL.Query().Get("download") == "true" || r.URL.Query().Get("format") == "webp" {
+		// Use the original filename from the form but change extension to .webp
+		filename := "image.webp"
+		
+		// Try to get the original filename from the form
+		file, fileHeader, err := r.FormFile("image")
+		if err == nil && fileHeader != nil {
+			defer file.Close()
+			if fileHeader.Filename != "" {
+				// Remove the original extension and replace with .webp
+				if extIndex := strings.LastIndex(fileHeader.Filename, "."); extIndex != -1 {
+					filename = fileHeader.Filename[:extIndex] + ".webp"
+				} else {
+					filename = fileHeader.Filename + ".webp"
+				}
+			}
+		}
+		
+		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
 	}
 
 	// Return the processed image

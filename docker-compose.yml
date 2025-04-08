@@ -1,0 +1,67 @@
+version: "3"
+
+services:
+  # Combined application with React frontend and Go backend
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - MAX_WIDTH=1920
+      - MAX_HEIGHT=1080
+      - DEFAULT_QUALITY=85
+    restart: unless-stopped
+    volumes:
+      # Optional: Mount test data for development
+      - ./test:/app/test
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8080/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  # Development service for the frontend
+  frontend-dev:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install -g pnpm && pnpm install && pnpm dev"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+    environment:
+      - NODE_ENV=development
+      # Configure API proxy to reach the Go backend
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+
+  # Development service for the backend
+  backend-dev:
+    image: golang:1.24-alpine
+    working_dir: /app
+    # Install required build dependencies and enable CGO
+    command: >
+      sh -c "apk add --no-cache gcc musl-dev &&
+             export CGO_ENABLED=1 &&
+             go run cmd/server/main.go"
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./:/app
+    environment:
+      - PORT=8080
+      - MAX_WIDTH=1920
+      - MAX_HEIGHT=1080
+      - DEFAULT_QUALITY=85
+      - CGO_ENABLED=1

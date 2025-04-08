@@ -31,6 +31,8 @@ func main() {
 	
 	// Set up HTTP routes
 	mux := http.NewServeMux()
+	
+	// API routes
 	mux.HandleFunc("/health", imageAPI.Health)
 	mux.HandleFunc("/process/url", imageAPI.ProcessFromURL)
 	mux.HandleFunc("/process/upload", imageAPI.ProcessFromUpload)
@@ -41,12 +43,20 @@ func main() {
 	testFileServer := http.FileServer(http.Dir(testDir))
 	mux.Handle("/test/", http.StripPrefix("/test/", testFileServer))
 	
-	// Add a redirect for root to the test page
+	// Set up static file server for the React frontend
+	staticDir := getStaticFilesDir()
+	log.Printf("Serving frontend from %s", staticDir)
+	staticFileServer := http.FileServer(http.Dir(staticDir))
+	
+	// Serve React frontend at root
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/" {
-			http.Redirect(w, r, "/test/test_image.html", http.StatusFound)
+		// API and test routes take precedence
+		if r.URL.Path == "/" || !fileExists(filepath.Join(staticDir, r.URL.Path)) {
+			// If the requested file doesn't exist, serve the root index.html
+			http.ServeFile(w, r, filepath.Join(staticDir, "index.html"))
 		} else {
-			http.NotFound(w, r)
+			// For existing files, serve them directly
+			staticFileServer.ServeHTTP(w, r)
 		}
 	})
 	
@@ -62,6 +72,7 @@ func main() {
 	// Start server in a goroutine
 	go func() {
 		log.Printf("Server starting on port %s...\n", cfg.Port)
+		log.Printf("React frontend available at http://localhost:%s/\n", cfg.Port)
 		log.Printf("Test page available at http://localhost:%s/test/test_image.html\n", cfg.Port)
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server failed to start: %v", err)
@@ -112,4 +123,40 @@ func getTestDataDir() string {
 	// Fallback to relative path from current working directory
 	log.Println("Warning: Could not find test data directory, falling back to current directory")
 	return filepath.Join(".", "test", "testdata")
+}
+
+// getStaticFilesDir returns the path to the React frontend static files
+func getStaticFilesDir() string {
+	// Get the executable directory
+	exePath, err := os.Executable()
+	if err != nil {
+		log.Printf("Warning: Could not determine executable path: %v, using current directory", err)
+		return filepath.Join(".", "static")
+	}
+	
+	exeDir := filepath.Dir(exePath)
+	
+	// Look for static files in different possible locations
+	possiblePaths := []string{
+		filepath.Join(exeDir, "static"),                   // Same directory as executable
+		filepath.Join(exeDir, "..", "static"),             // One level up
+		filepath.Join(exeDir, "..", "..", "static"),       // Two levels up (for dev environment)
+		filepath.Join(exeDir, "..", "..", "..", "static"), // Three levels up
+	}
+	
+	for _, path := range possiblePaths {
+		if _, err := os.Stat(path); err == nil {
+			return path
+		}
+	}
+	
+	// Fallback to relative path from current working directory
+	log.Println("Warning: Could not find static directory, falling back to current directory")
+	return filepath.Join(".", "static")
+}
+
+// fileExists checks if a file exists at the given path
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
 } 

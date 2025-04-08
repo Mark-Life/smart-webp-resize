@@ -3,6 +3,7 @@ package processor
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"image"
 	_ "image/jpeg" // Register JPEG format
 	_ "image/png"  // Register PNG format
@@ -252,6 +253,8 @@ func (p *defaultProcessor) encodeToWebP(img image.Image, quality int) ([]byte, e
 		quality = 100
 	}
 	
+	fmt.Printf("Encoding image to WebP with quality: %d\n", quality)
+	
 	// Encode to WebP
 	var buf bytes.Buffer
 	err := webp.Encode(&buf, img, &webp.Options{
@@ -259,8 +262,20 @@ func (p *defaultProcessor) encodeToWebP(img image.Image, quality int) ([]byte, e
 		Quality:  float32(quality),
 	})
 	if err != nil {
+		fmt.Printf("WebP encoding failed: %v\n", err)
 		return nil, ErrEncodingFailed
 	}
 	
-	return buf.Bytes(), nil
+	webpData := buf.Bytes()
+	fmt.Printf("WebP encoding successful, output size: %d bytes\n", len(webpData))
+	
+	// Verify the WebP header - it should start with RIFF....WEBP
+	if len(webpData) >= 12 && bytes.HasPrefix(webpData, []byte{0x52, 0x49, 0x46, 0x46}) &&
+		bytes.Equal(webpData[8:12], []byte{0x57, 0x45, 0x42, 0x50}) {
+		fmt.Println("Output verified as valid WebP format")
+	} else {
+		fmt.Println("WARNING: Output does not have valid WebP header!")
+	}
+	
+	return webpData, nil
 } 

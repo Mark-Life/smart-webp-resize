@@ -155,18 +155,100 @@ This interface allows you to:
    ./scripts/run.sh
    ```
 
-### Project Structure
+## React Frontend
 
-- `cmd/`: Application entry points
-- `internal/`: Private application code
-  - `api/`: HTTP API implementation
-  - `handler/`: Image input handling
-  - `processor/`: Core image processing logic
-- `pkg/`: Public libraries and models
-- `scripts/`: Build and deployment scripts
-- `test/`: Test files and test utilities
+The project now includes a modern React frontend built with Next.js that provides an improved user experience for image processing.
 
-## Deployment
+### Frontend Features
+
+- Drag-and-drop interface for image uploads
+- URL-based image processing
+- Customizable settings for image dimensions and quality
+- Before/after image comparison
+- Detailed metadata display
+- Responsive design
+
+### Frontend Development
+
+To work on the frontend separately:
+
+```bash
+cd frontend
+pnpm install
+pnpm dev
+```
+
+The development server will start at http://localhost:3000 and will proxy API requests to your Go backend.
+
+## Docker Development
+
+The project includes Docker configurations for both development and production:
+
+### Using Docker Compose for Development
+
+Start the complete environment with frontend and backend:
+
+```bash
+# Start all services (frontend, backend, and combined app)
+docker-compose up
+
+# Start in detached mode (run in background)
+docker-compose up -d
+```
+
+This will start:
+
+- The combined application at http://localhost:8080
+- The frontend development server at http://localhost:3000
+- The backend development server at http://localhost:8081
+
+For individual services:
+
+```bash
+# Frontend development only
+docker-compose up frontend-dev
+
+# Backend development only
+docker-compose up backend-dev
+```
+
+### Restart Services After Code Changes
+
+```bash
+# Restart and rebuild the frontend after code changes
+docker-compose stop frontend-dev
+docker-compose up --build frontend-dev
+
+# Restart and rebuild the backend after code changes
+docker-compose stop backend-dev
+docker-compose up --build backend-dev
+
+# Restart everything and rebuild all containers
+docker-compose down
+docker-compose up --build
+```
+
+### View Logs
+
+```bash
+# View logs for a specific service
+docker-compose logs frontend-dev
+docker-compose logs backend-dev
+
+# Follow logs in real-time
+docker-compose logs -f frontend-dev
+```
+
+### Building the Production Docker Image
+
+Build and run the production Docker image:
+
+```bash
+docker build -t webp-resizer .
+docker run -p 8080:8080 webp-resizer
+```
+
+## Deployment Options
 
 ### Local Deployment
 
@@ -183,6 +265,32 @@ Run the server locally:
    ```bash
    ./scripts/deploy-lambda.sh
    ```
+
+### Google Cloud Run Deployment
+
+1. Update the configuration in `scripts/deploy-cloud-run.sh`
+2. Run the deployment script:
+   ```bash
+   ./scripts/deploy-cloud-run.sh
+   ```
+
+This will:
+
+- Build and push the Docker image to Google Container Registry
+- Deploy to Google Cloud Run with appropriate resource constraints
+- Set up authentication and rate limiting for cost management
+- Create a service account for secure access
+
+## Cost Management for Cloud Deployment
+
+The Google Cloud Run deployment includes several cost management features:
+
+1. **Resource Limits**: Configures memory, CPU, and maximum instances
+2. **Rate Limiting**: Limits the number of requests per minute
+3. **Authentication**: Requires authentication to prevent unauthorized use
+4. **Instance Auto-scaling**: Scales down to zero when not in use
+
+You can adjust these settings in the `scripts/deploy-cloud-run.sh` script.
 
 ## Environment Variables
 
