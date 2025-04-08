@@ -312,4 +312,14 @@ You can adjust these settings in the `scripts/deploy-cloud-run.sh` script.
 
 ## License
 
-MIT
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+The MIT License is a permissive license that allows for reuse with very few restrictions. It permits users to:
+
+- Use the code commercially
+- Modify the code
+- Distribute the code
+- Use the code privately
+- Sublicense the code
+
+The only requirement is that the original copyright and license notice be included in any copy of the software/source.
