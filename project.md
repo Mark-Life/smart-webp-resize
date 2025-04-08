@@ -7,7 +7,7 @@ This serverless function takes an image as input (uploaded directly or reference
 **Functionality:**
 
 1.  **Input:**
-    - Accepts images in common formats: JPEG, PNG, GIF (BMP, TIFF if you want to get fancy)
+    - Accepts images in common formats: JPEG, PNG, (BMP, TIFF if you want to get fancy)
     - Image source:
       - Direct upload (multipart form data)
       - URL (passed as a query parameter or in the request body)
@@ -102,7 +102,7 @@ The "smart" resizing logic is key here. Here's a good approach for determining t
 2.  **Set up Your Development Environment:** Install Go and any necessary libraries.
 3.  **Implement the Core Logic:**
     - Input handling (file upload or URL).
-    - Image decoding (JPEG, PNG, GIF).
+    - Image decoding (JPEG, PNG).
     - Smart resizing logic (as described above).
     - WebP conversion.
     - Output generation (return image data or store in object storage).
@@ -115,58 +115,59 @@ The "smart" resizing logic is key here. Here's a good approach for determining t
 
 - [x] **Project Setup**
 
-  - [x] Initialize Go module
-  - [x] Set up directory structure (cmd, internal, pkg, test)
-  - [x] Configure linting
-  - [x] Create a simple API server stub
+  - [x] Initialize Go module (`go.mod`)
+  - [x] Set up directory structure (`cmd/`, `internal/`, `pkg/`, `test/`)
+  - [x] Configure linting (`.gitignore`)
+  - [x] Create a simple API server stub (`cmd/server/main.go`)
 
 - [x] **Define Core Interfaces**
 
-  - [x] Define interfaces for image processing pipeline
-  - [x] Create domain models for request/response
-  - [x] Document interfaces
+  - [x] Define interfaces for image processing pipeline (`internal/processor/processor.go`)
+  - [x] Create domain models for request/response (`pkg/models/image.go`)
+  - [x] Document interfaces (`internal/processor/processor.go`, `pkg/models/image.go`)
 
 - [x] **Image Input Handler**
 
-  - [x] Write tests for URL-based image retrieval
-  - [x] Implement image retrieval from URL
-  - [x] Write tests for file upload handling
-  - [x] Implement file upload handling
+  - [x] Write tests for URL-based image retrieval (`internal/handler/image_handler_test.go`)
+  - [x] Implement image retrieval from URL (`internal/handler/image_handler.go`)
+  - [x] Write tests for file upload handling (`internal/handler/file_upload_test.go`)
+  - [x] Implement file upload handling (`internal/handler/image_handler.go`)
+  - [x] API integration (`internal/api/image_api.go`, `cmd/server/main.go`)
 
-- [ ] **Image Processing**
+- [x] **Image Processing**
 
-  - [ ] Write tests for image format detection
-  - [ ] Implement image format detection
-  - [ ] Write tests for image decoding
-  - [ ] Implement multi-format image decoder
+  - [x] Write tests for image format detection (`internal/processor/processor_test.go`)
+  - [x] Implement image format detection (`internal/processor/processor.go`)
+  - [x] Write tests for image decoding (`internal/processor/processor_test.go`)
+  - [x] Implement multi-format image decoder (`internal/processor/processor.go`)
 
-- [ ] **Smart Resizing**
+- [x] **Smart Resizing**
 
-  - [ ] Write tests for dimension calculation logic
-  - [ ] Implement dimension calculation
-  - [ ] Write tests for image resizing
-  - [ ] Implement image resizing
+  - [x] Write tests for dimension calculation logic (`internal/processor/processor_test.go`)
+  - [x] Implement dimension calculation (`internal/processor/processor.go`)
+  - [x] Write tests for image resizing (`internal/processor/processor_test.go`)
+  - [x] Implement image resizing (`internal/processor/processor.go`)
 
-- [ ] **WebP Conversion**
+- [x] **WebP Conversion**
 
-  - [ ] Write tests for WebP encoding
-  - [ ] Implement WebP conversion
-  - [ ] Write tests for quality optimization
-  - [ ] Implement quality settings
+  - [x] Write tests for WebP encoding (`internal/processor/processor_test.go`)
+  - [x] Implement WebP conversion (`internal/processor/processor.go`)
+  - [x] Write tests for quality optimization (`internal/processor/processor_test.go`)
+  - [x] Implement quality settings (`internal/processor/processor.go`)
 
-- [ ] **Output Generation**
+- [x] **Output Generation**
 
-  - [ ] Write tests for response formatting
-  - [ ] Implement image response handler
-  - [ ] Write tests for metadata generation
-  - [ ] Implement metadata generation
+  - [x] Write tests for response formatting (`internal/api/image_api_test.go`)
+  - [x] Implement image response handler (`internal/api/image_api.go`)
+  - [x] Write tests for metadata generation (`internal/processor/processor_test.go`)
+  - [x] Implement metadata generation (`internal/processor/processor.go`)
 
-- [ ] **Integration**
+- [x] **Integration**
 
-  - [ ] Write integration tests
-  - [ ] Connect all components
-  - [ ] Create API endpoints
-  - [ ] Implement comprehensive error handling
+  - [x] Write integration tests (`test/testdata/test_image.html`)
+  - [x] Connect all components (`cmd/server/main.go`)
+  - [x] Create API endpoints (`internal/api/image_api.go`)
+  - [x] Implement comprehensive error handling (`internal/processor/processor.go`, `internal/handler/image_handler.go`)
 
 - [ ] **Performance Testing**
 
@@ -175,15 +176,15 @@ The "smart" resizing logic is key here. Here's a good approach for determining t
   - [ ] Identify and optimize bottlenecks
   - [ ] Test concurrency handling
 
-- [ ] **Deployment**
+- [x] **Deployment**
 
-  - [ ] Write serverless configuration
-  - [ ] Create deployment scripts
+  - [x] Write serverless configuration (`scripts/deploy-lambda.sh`)
+  - [x] Create deployment scripts (`scripts/run.sh`, `scripts/deploy-lambda.sh`)
   - [ ] Test in staging environment
-  - [ ] Document deployment process
+  - [x] Document deployment process (`README.md`)
 
-- [ ] **Documentation**
-  - [ ] Write API documentation
-  - [ ] Create usage examples
-  - [ ] Document configuration options
-  - [ ] Complete project README
+- [x] **Documentation**
+  - [x] Write API documentation (`README.md`)
+  - [x] Create usage examples (`README.md`, `test/testdata/test_image.html`)
+  - [x] Document configuration options (`pkg/config/config.go`, `README.md`)
+  - [x] Complete project README (`README.md`)

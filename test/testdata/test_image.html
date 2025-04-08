@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart WebP Resizer Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.6;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .section {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        background-color: #f9f9f9;
+      }
+      h1 {
+        color: #333;
+      }
+      h2 {
+        color: #444;
+        margin-top: 0;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      input,
+      select {
+        margin-bottom: 15px;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      input[type="submit"] {
+        background-color: #4caf50;
+        color: white;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      input[type="submit"]:hover {
+        background-color: #45a049;
+      }
+      .result {
+        margin-top: 20px;
+        display: none;
+      }
+      img {
+        max-width: 100%;
+        border: 1px solid #ddd;
+      }
+      pre {
+        background-color: #f1f1f1;
+        padding: 10px;
+        overflow-x: auto;
+        border-radius: 4px;
+      }
+      .flex-container {
+        display: flex;
+        gap: 20px;
+      }
+      .flex-container > div {
+        flex: 1;
+      }
+      @media (max-width: 768px) {
+        .flex-container {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Smart WebP Resizer Test</h1>
+
+    <div class="container">
+      <!-- Upload Image Form -->
+      <div class="section">
+        <h2>Upload Image</h2>
+        <form id="uploadForm" enctype="multipart/form-data">
+          <label for="imageFile">Select Image:</label>
+          <input
+            type="file"
+            id="imageFile"
+            name="image"
+            accept="image/*"
+            required
+          />
+
+          <label for="maxWidth">Max Width:</label>
+          <input
+            type="number"
+            id="maxWidth"
+            name="max_width"
+            value="1920"
+            min="1"
+          />
+
+          <label for="maxHeight">Max Height:</label>
+          <input
+            type="number"
+            id="maxHeight"
+            name="max_height"
+            value="1080"
+            min="1"
+          />
+
+          <label for="quality">Quality (1-100):</label>
+          <input
+            type="number"
+            id="quality"
+            name="quality"
+            value="85"
+            min="1"
+            max="100"
+          />
+
+          <label for="preserveRatio">Preserve Aspect Ratio:</label>
+          <select id="preserveRatio" name="preserve_ratio">
+            <option value="true" selected>Yes</option>
+            <option value="false">No</option>
+          </select>
+
+          <input type="submit" value="Process Image" />
+        </form>
+
+        <div id="uploadResult" class="result">
+          <div class="flex-container">
+            <div>
+              <h3>Original Image</h3>
+              <img id="originalImage" src="" alt="Original Image" />
+            </div>
+            <div>
+              <h3>Processed Image</h3>
+              <img id="processedImage" src="" alt="Processed Image" />
+            </div>
+          </div>
+
+          <h3>Metadata</h3>
+          <pre id="metadata"></pre>
+        </div>
+      </div>
+
+      <!-- Process from URL Form -->
+      <div class="section">
+        <h2>Process Image from URL</h2>
+        <form id="urlForm">
+          <label for="imageUrl">Image URL:</label>
+          <input
+            type="url"
+            id="imageUrl"
+            name="url"
+            placeholder="https://example.com/image.jpg"
+            required
+          />
+
+          <label for="urlMaxWidth">Max Width:</label>
+          <input
+            type="number"
+            id="urlMaxWidth"
+            name="max_width"
+            value="1920"
+            min="1"
+          />
+
+          <label for="urlMaxHeight">Max Height:</label>
+          <input
+            type="number"
+            id="urlMaxHeight"
+            name="max_height"
+            value="1080"
+            min="1"
+          />
+
+          <label for="urlQuality">Quality (1-100):</label>
+          <input
+            type="number"
+            id="urlQuality"
+            name="quality"
+            value="85"
+            min="1"
+            max="100"
+          />
+
+          <label for="urlPreserveRatio">Preserve Aspect Ratio:</label>
+          <select id="urlPreserveRatio" name="preserve_ratio">
+            <option value="true" selected>Yes</option>
+            <option value="false">No</option>
+          </select>
+
+          <input type="submit" value="Process Image" />
+        </form>
+
+        <div id="urlResult" class="result">
+          <div class="flex-container">
+            <div>
+              <h3>Original Image</h3>
+              <img id="urlOriginalImage" src="" alt="Original Image" />
+            </div>
+            <div>
+              <h3>Processed Image</h3>
+              <img id="urlProcessedImage" src="" alt="Processed Image" />
+            </div>
+          </div>
+
+          <h3>Metadata</h3>
+          <pre id="urlMetadata"></pre>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Upload Form Handler
+      document
+        .getElementById("uploadForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          try {
+            const formData = new FormData(this);
+            const imageFile = document.getElementById("imageFile").files[0];
+
+            // Display original image
+            const originalImage = document.getElementById("originalImage");
+            originalImage.src = URL.createObjectURL(imageFile);
+
+            // Process image with parameters
+            const metadataResponse = await fetch(
+              "/process/upload?metadata=true",
+              {
+                method: "POST",
+                body: formData,
+              }
+            );
+
+            if (!metadataResponse.ok) {
+              throw new Error(`HTTP error! status: ${metadataResponse.status}`);
+            }
+
+            const metadata = await metadataResponse.json();
+            document.getElementById("metadata").textContent = JSON.stringify(
+              metadata,
+              null,
+              2
+            );
+
+            // Get the processed image (make a second request without metadata flag)
+            const imageResponse = await fetch(
+              "/process/upload?" +
+                new URLSearchParams({
+                  max_width: document.getElementById("maxWidth").value,
+                  max_height: document.getElementById("maxHeight").value,
+                  quality: document.getElementById("quality").value,
+                  preserve_ratio:
+                    document.getElementById("preserveRatio").value,
+                }),
+              {
+                method: "POST",
+                body: formData,
+              }
+            );
+
+            if (!imageResponse.ok) {
+              throw new Error(`HTTP error! status: ${imageResponse.status}`);
+            }
+
+            const blob = await imageResponse.blob();
+            const processedImage = document.getElementById("processedImage");
+            processedImage.src = URL.createObjectURL(blob);
+
+            // Show results
+            document.getElementById("uploadResult").style.display = "block";
+          } catch (error) {
+            console.error("Error:", error);
+            alert("Error processing image: " + error.message);
+          }
+        });
+
+      // URL Form Handler
+      document
+        .getElementById("urlForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          try {
+            const formData = new FormData(this);
+            const imageUrl = document.getElementById("imageUrl").value;
+
+            // Display original image
+            const originalImage = document.getElementById("urlOriginalImage");
+            originalImage.src = imageUrl;
+
+            // Create URL parameters
+            const params = new URLSearchParams({
+              url: imageUrl,
+              max_width: document.getElementById("urlMaxWidth").value,
+              max_height: document.getElementById("urlMaxHeight").value,
+              quality: document.getElementById("urlQuality").value,
+              preserve_ratio: document.getElementById("urlPreserveRatio").value,
+              metadata: "true",
+            });
+
+            // Process image and get metadata
+            const metadataResponse = await fetch("/process/url?" + params);
+
+            if (!metadataResponse.ok) {
+              throw new Error(`HTTP error! status: ${metadataResponse.status}`);
+            }
+
+            const metadata = await metadataResponse.json();
+            document.getElementById("urlMetadata").textContent = JSON.stringify(
+              metadata,
+              null,
+              2
+            );
+
+            // Get the processed image
+            params.delete("metadata");
+            const imageResponse = await fetch("/process/url?" + params);
+
+            if (!imageResponse.ok) {
+              throw new Error(`HTTP error! status: ${imageResponse.status}`);
+            }
+
+            const blob = await imageResponse.blob();
+            const processedImage = document.getElementById("urlProcessedImage");
+            processedImage.src = URL.createObjectURL(blob);
+
+            // Show results
+            document.getElementById("urlResult").style.display = "block";
+          } catch (error) {
+            console.error("Error:", error);
+            alert("Error processing image: " + error.message);
+          }
+        });
+    </script>
+  </body>
+</html>
