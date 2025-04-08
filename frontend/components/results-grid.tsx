@@ -159,7 +159,7 @@ export function ResultsGrid({ processedImages }: ResultsGridProps) {
           <Card key={image.id} className="overflow-hidden">
             <div className="aspect-video relative">
               <img
-                src={image.preview || "/placeholder.svg"}
+                src={image.preview}
                 alt={image.name}
                 className="object-cover"
               />
@@ -170,9 +170,9 @@ export function ResultsGrid({ processedImages }: ResultsGridProps) {
                 <h3 className="font-medium truncate" title={image.name}>
                   {image.name}
                 </h3>
-                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                {/* <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
                   {image.metadata.size_reduction_percent}% smaller
-                </span>
+                </span> */}
               </div>
 
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
