@@ -3,6 +3,7 @@
 A serverless image processing service that automatically resizes images to web-optimal dimensions and converts them to WebP format for improved performance. Supports input via direct upload or URL.
 
 Backend: Go
+
 Frontend: Next.js
 
 [webp.mark-life.com](https://webp.mark-life.com/)
