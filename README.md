@@ -4,6 +4,7 @@ A serverless image processing service that automatically resizes images to web-o
 
 - Backend: Go
 - Frontend: Next.js
+- Hosting: Google Cloud Run
 
 [webp.mark-life.com](https://webp.mark-life.com/)
 
